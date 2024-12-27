@@ -6,14 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
+    <title>{{ config('app.name', 'To-Do') }}</title>
+    <link rel="icon" href="{{ asset('assets/img/logo.png') }}" type="image/png">
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function deleteTaskWithConfirmation(event) {
+            event.preventDefault(); // Prevent the default form submission or action
+        
+            // Use SweetAlert2 to show a custom confirmation dialog
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3f77ac'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, proceed with the delete action
+                    event.target.closest('form').submit(); // Assuming the button is inside a form
+                }
+            });
+        }
+    </script>
     <!-- Styles -->
     @livewireStyles
     @powerGridStyles

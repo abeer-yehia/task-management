@@ -39,13 +39,13 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
         $task = new Task();
-        $priority = Task::where('created_by', NULL)->max('priority') + 1;
-
 
         $task->created_by = auth()->id();
         $task->project_id = $request->project_name;
-        $task->name = $request->task_name;
-        $task->priority = $priority;
+        $task->title = $request->task_name;
+        $task->description = $request->description;
+        $task->priority = $request->priority;
+        $task->due_date = $request->due_date;
         $task->save();
 
         return redirect()->route('tasks.index')->with(['message' => 'Task has been saved', 'status' => true]);
@@ -87,7 +87,11 @@ class TaskController extends Controller
     {
         $task->created_by = auth()->id();
         $task->project_id = $request->project_name;
-        $task->name = $request->task_name;
+        $task->title = $request->task_name;
+        $task->description = $request->description;
+        $task->priority = $request->priority;
+        $task->status = $request->status;
+        $task->due_date = $request->due_date;
         $task->update();
 
         return redirect()->route('tasks.index')->with(['message' => 'Task has been updated', 'status' => true]);
@@ -101,7 +105,6 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        Task::where('created_by', NULL)->where('priority', '>', $task->priority)->decrement('priority', 1);
         $task->delete();
         return redirect()->route('tasks.index')->with(['message' => 'Task has been deleted', 'status' => true]);
     }

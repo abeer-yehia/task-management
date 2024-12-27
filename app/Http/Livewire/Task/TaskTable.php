@@ -7,11 +7,17 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use PowerComponents\LivewirePowerGrid\Rules\{Rule, RuleActions};
 use PowerComponents\LivewirePowerGrid\Traits\ActionButton;
-use PowerComponents\LivewirePowerGrid\{Button, Column, Exportable, Footer, Header, PowerGrid, PowerGridComponent, PowerGridEloquent};
+use PowerComponents\LivewirePowerGrid\{Button, Column, Exportable, Footer, Header,PowerGrid, PowerGridComponent, PowerGridEloquent,PowerGridFields};
+use App\Enums\Priority;
 
 final class TaskTable extends PowerGridComponent
 {
     use ActionButton;
+
+    public bool $multiSort = true;
+
+    // public string $sortField = 'tasks.due_date';
+    public string $sortField = 'priority';
 
     /*
     |--------------------------------------------------------------------------
@@ -50,7 +56,26 @@ final class TaskTable extends PowerGridComponent
      */
     public function datasource(): Builder
     {
-        return Task::query()->with(['project', 'createdBy'])->orderBy('priority', 'desc')->orderBy('updated_at', 'desc');
+        Task::where('due_date', '<', Carbon::now())
+        ->where('status', '!=', 'Completed')
+        ->update(['status' => 'Overdue']);
+        $query = Task::query()->with(['project', 'createdBy']);
+
+        $query->when($this->sortField, function ($query) {
+            if ($this->sortField === 'priority') {
+                $sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+                $query->orderByRaw("FIELD(priority, 'Low', 'Medium', 'High') " . $sortDirection);
+            }
+            if ($this->sortField === 'due_date') {
+                $sortDirection = $this->sortDirection === 'asc' ? 'asc' : 'desc';
+                $query->orderBy('due_date', $sortDirection);
+            }
+        });
+
+        $query->orderBy('updated_at', 'desc');
+    
+        return  $query ;
+        
     }
 
     /*
@@ -73,7 +98,13 @@ final class TaskTable extends PowerGridComponent
             'createdBy'
         ];
     }
-
+    // public function fields(): PowerGridFields
+    // {
+    //     return PowerGrid::fields()
+    //         ->add('id')
+    //         ->add('dish_name', fn ($dish) => $dish->name)
+    //         ->add('diet', fn ($dish) => \App\Enums\Status::from($dish->diet)->labels());
+    // }
     /*
     |--------------------------------------------------------------------------
     |  Add Column
@@ -94,30 +125,23 @@ final class TaskTable extends PowerGridComponent
             ->addColumn('project_id', function (Task $model) {
                 return strtolower(e($model->project->name));
             })
-            ->addColumn('priority', function (Task $model) {
-                $possition = '';
-                if ($model->priority >= 1) {
-                    $possition =  '<a wire:click="task_up(' . $model->id . ')" href="#">
-                    &uarr;
-                </a>';
-                }
-
-
-                if ($model->priority < $model->max('priority')) {
-                    $possition =  '<a wire:click="task_down(' . $model->id . ')" href="#">
-                    &darr;
-                </a>';
-                }
-                return  $model->priority . " " . $possition;
+            ->addColumn('priority_label', function (Task $model) {
+                $priority = $model->priority->value;  // Get the string value of the enum
+                return $priority;
             })
-
-
-
-
+            ->addColumn('status_label', function (Task $model) {
+                $status = $model->status->value;  // Get the string value of the enum
+                $class = $status === 'Overdue' ? ' text-danger' : ''; 
+                $icon = $status === 'Overdue' ? '<i class="fas fa-exclamation-triangle"></i>' : ''; 
+                $strikethrough = $status === 'Completed' ? 'text-success text-decoration-line-through' : '';
+                return "<span class='{$class}{$strikethrough}'>{$icon} {$status}</span>";
+            })
             ->addColumn('name')
-            ->addColumn('created_at_formatted', fn (Task $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->addColumn('updated_at_formatted', fn (Task $model) => Carbon::parse($model->updated_at)->format('d/m/Y H:i:s'));
+            ->addColumn('due_date', fn (Task $model) => Carbon::parse($model->due_date)->format('d/m/Y'))
+            ;
     }
+
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -142,28 +166,20 @@ final class TaskTable extends PowerGridComponent
 
             Column::make('PROJECT', 'project_id'),
 
-
-            Column::make('PRIORITY', 'priority')
-                ->makeInputRange(),
-
-
-
-            Column::make('NAME', 'name')
-                ->sortable()
+            Column::make('TITLE', 'title')
                 ->searchable()
                 ->makeInputText(),
+            Column::make('PRIORITY', 'priority_label','priority')
+            ->sortable()
+            ->makeInputText(),
 
-
-
-            Column::make('CREATED AT', 'created_at_formatted', 'created_at')
+            Column::make('DUE DATE', 'due_date')
                 ->searchable()
                 ->sortable()
                 ->makeInputDatePicker(),
-
-            Column::make('UPDATED AT', 'updated_at_formatted', 'updated_at')
-                ->searchable()
-                ->sortable()
-                ->makeInputDatePicker(),
+            Column::make('STATUS', 'status_label','status')
+            ->makeInputText(
+                ),
 
         ];
     }
@@ -192,9 +208,10 @@ final class TaskTable extends PowerGridComponent
                 ->target('_self'),
 
             Button::make('destroy', 'Delete')
-                ->class('btn btn-outline-primary btn-sm float-right')
+            ->class('btn btn-outline-danger btn-sm float-right')
                 ->route('tasks.destroy', ['task' => 'id'])
                 ->method('delete')
+                ->emit('task-destroy', ['task' => 'id'])
         ];
     }
 
@@ -212,39 +229,17 @@ final class TaskTable extends PowerGridComponent
      *
      * @return array<int, RuleActions>
      */
-
-    /*
     public function actionRules(): array
     {
-       return [
-
-           //Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($task) => $task->id === 1)
-                ->hide(),
+        return [
+            Rule::button('destroy')
+            // ->when(fn($task) => $task->status !== 'Completed')
+            ->when(fn($task) => true)
+                ->setAttribute('onclick',  'deleteTaskWithConfirmation(event)')
         ];
     }
-    */
+   
 
-    public function task_up($task_id)
-    {
-        $task = Task::find($task_id);
-        if ($task) {
-            Task::where('created_by', auth()->id())->where('priority', $task->priority - 1)->update([
-                'priority' => $task->priority
-            ]);
-            $task->update(['priority' => $task->priority - 1]);
-        }
-    }
-
-    public function task_down($task_id)
-    {
-        $task = Task::find($task_id);
-        if ($task) {
-            Task::where('created_by', auth()->id())->where('priority', $task->priority + 1)->update([
-                'priority' => $task->priority
-            ]);
-            $task->update(['priority' => $task->priority + 1]);
-        }
-    }
+   
+    
 }

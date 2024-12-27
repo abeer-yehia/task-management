@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\Priority;
+use App\Enums\Status;
 
 class Task extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'created_by', 'project_id', 'priority',  'name',
+        'created_by', 'project_id', 'priority','status',  'name',
     ];
 
     /**
@@ -33,4 +35,9 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    protected $casts = [
+        'priority' => Priority::class,
+        'status' => Status::class,
+    ];
 }

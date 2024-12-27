@@ -31,13 +31,42 @@
                                 @endif
                             </div>
                             <div class="mb-3">
-                                <label for="task_name" class="form-label">Task Name</label>
+                                <label for="task_name" class="form-label">Task Title</label>
                                 <input type="text" name="task_name" class="form-control {{ $errors->has('task_name') ? 'is-invalid' : '' }}" id="task_name" placeholder="Task name" value="{{ old('task_name') }}" />
                                 @if($errors->has('task_name'))
                                 <div class="invalid-feedback">{{$errors->first('task_name')}}</div>
                                 @endif
                             </div>
-
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea name="description" id="description" class="form-control {{ $errors->has('description') ? 'is-invalid' : '' }}" rows="4" placeholder="Enter task description">{{ old('description') }}</textarea>
+                                @if($errors->has('description'))
+                                    <div class="invalid-feedback">{{ $errors->first('description') }}</div>
+                                @endif
+                            </div>
+                            <div class="mb-3">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select name="priority" id="priority" class="form-control {{ $errors->has('priority') ? 'is-invalid' : '' }}">
+                                    <option value="">Select a priority</option>
+                                    @foreach (\App\Enums\Priority::cases() as $priority)
+                                        <option value="{{ $priority->value }}" 
+                                            {{ old('priority') === $priority->value ? 'selected' : '' }}>
+                                            {{ $priority->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if ($errors->has('priority'))
+                                    <div class="invalid-feedback">{{ $errors->first('priority') }}</div>
+                                @endif
+                            </div>
+                           
+                            <div class="mb-3">
+                                <label for="due_date" class="form-label">Due Date</label>
+                                <input type="date" name="due_date" class="form-control {{ $errors->has('due_date') ? 'is-invalid' : '' }}" id="due_date" placeholder="Due Date" value="{{ old('due_date') }}" />
+                                @if($errors->has('due_date'))
+                                <div class="invalid-feedback">{{$errors->first('due_date')}}</div>
+                                @endif
+                            </div>
                             <button type="submit" class="btn btn-outline-primary btn-sm float-right">Save</button>
                         </form>
                     </div>

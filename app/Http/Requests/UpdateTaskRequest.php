@@ -26,6 +26,8 @@ class UpdateTaskRequest extends FormRequest
         return [
             'project_name' => ['required'],
             'task_name' => ['required'],
+            'priority' => ['required'],
+            'due_date' => ['required', 'date'],
         ];
     }
 }

@@ -1,94 +1,68 @@
-# Simple Loan management system
+# To-Do Application 
 
-<p align="center"><a href="https://github.com/bokele" target="_blank">
-<img src="/public/assets/dashboard.png" width="400"></a></p>
-
-# Brief
-
-> simple Laravel web application for task management.
 
 # Objective
 
-> Build a system that will enable the company to task process with the necessary business rules.
+> Build a To-Do application that allows users to manage tasks, track priorities, mark tasks as completed, and automatically handle overdue tasks, with sorting functionality by priority and due date.
 
-# Tasks
 
--   implement the system with a framework of your choice.
--   Package the solution in a deployable package or hos it and share the url, include a readme file for instructions.
--   Include a brief write up describing your solution
-
-## Requirements
-
--   Php 8.1 and above
--   Composer
--   Since this project is running laravel 9, we suggest checking out the official requirements [here](https://laravel.com/docs/9.x/upgrade#updating-dependencies)
 
 ## Installation
 
--   Clone the repository by running the following command in your comamand line below (Or you can dowload zip file from github)
 
-```shell
-git clone git@github.com:bokele/task-management.git  ./task-management
+
+```bash
+git clone https://github.com/abeer-yehia/task-management.git
 ```
 
--   Head to the project's directory
 
-```shell
+```bash
 cd task-management
 ```
 
--   Install composer dependancies
-
-```shell
+```bash
 composer install
 ```
 
 -   Copy .env.example file into .env file and configure based on your environment
 
-```shell
+```bash
 cp .env.example .env
 ```
 
 -   Generate encryption key
 
-```shell
+```bash
 php artisan key:generate
 ```
 
 -   Migrate the database
 
-```shell
+```bash
 php artisan migrate
 ```
 
 -   Seed database
-    ```shell
+    ```bash
     php artisan db:seed
     ```
 -   Install npm dependancies
 
-```shell
+```bash
 npm install
 ```
 
--   For development or testing purposes, you can use the laravel built in server by running
 
-```shell
+
+```bash
 npm run dev
 ```
 
-```shell
+```bash
 php artisan serve
 ```
 
-## Setup
 
--   Log in to the application with the following credentials
+``` 
+ The application will be accessible at http://127.0.0.1:8000
 
-    -   Register and login
-
-### Admin
-
--   Ability to manage all Project
--   Ability to create, edit, view and delete Project
--   Ability to create, edit, view and delete Task

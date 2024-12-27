@@ -98,8 +98,9 @@ final class ProjectTable extends PowerGridComponent
             })
 
             ->addColumn('name')
-            ->addColumn('created_at_formatted', fn (Project $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
-            ->addColumn('updated_at_formatted', fn (Project $model) => Carbon::parse($model->updated_at)->format('d/m/Y H:i:s'));
+            // ->addColumn('created_at_formatted', fn (Project $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'))
+            // ->addColumn('updated_at_formatted', fn (Project $model) => Carbon::parse($model->updated_at)->format('d/m/Y H:i:s'))
+            ;
     }
 
     /*
@@ -133,15 +134,15 @@ final class ProjectTable extends PowerGridComponent
                 ->searchable()
                 ->makeInputText(),
 
-            Column::make('CREATED AT', 'created_at_formatted', 'created_at')
-                ->searchable()
-                ->sortable()
-                ->makeInputDatePicker(),
+            // Column::make('CREATED AT', 'created_at_formatted', 'created_at')
+            //     ->searchable()
+            //     ->sortable()
+            //     ->makeInputDatePicker(),
 
-            Column::make('UPDATED AT', 'updated_at_formatted', 'updated_at')
-                ->searchable()
-                ->sortable()
-                ->makeInputDatePicker(),
+            // Column::make('UPDATED AT', 'updated_at_formatted', 'updated_at')
+            //     ->searchable()
+            //     ->sortable()
+            //     ->makeInputDatePicker(),
 
         ];
     }
@@ -165,16 +166,16 @@ final class ProjectTable extends PowerGridComponent
     {
         return [
             Button::make('edit', 'Edit')
-                ->class('btn btn-outline-warning btn-sm float-right mb-2')
+                ->class('btn btn-outline-warning btn-sm float-right m-2')
                 ->route('projects.edit', ['project' => 'id'])
                 ->target('_self'),
             Button::make('show', 'Details')
-                ->class('btn btn-outline-primary btn-sm float-right mb-2')
+                ->class('btn btn-outline-primary btn-sm float-right m-2')
                 ->route('projects.show', ['project' => 'id'])
                 ->target('_self'),
 
             Button::make('destroy', 'Delete')
-                ->class('btn btn-outline-danger btn-sm float-right')
+                ->class('btn btn-outline-danger btn-sm float-right m-2')
                 ->route('projects.destroy', ['project' => 'id'])
                 ->method('delete')
         ];

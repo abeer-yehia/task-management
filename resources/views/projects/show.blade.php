@@ -31,7 +31,7 @@
                                 <td>{{$project->createdBy->name}}</td>
 
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <th>Created At</th>
                                 <td>{{$project->created_at}}</td>
 
@@ -40,7 +40,7 @@
                                 <th>Updated At</th>
                                 <td>{{$project->updated_at}}</td>
 
-                            </tr>
+                            </tr> --}}
                         </table>
 
                         <table class="table table-bordered">
@@ -48,20 +48,22 @@
                             <thead>
                                 <tr>
                                     <th>Priority</th>
+                                    <th>Status</th>
                                     <th>Name</th>
-                                    <th>Created By</th>
-                                    <th>Created At</th>
-                                    <th>Updated At</th>
+                                    <th>Due Date</th>
+                                    {{-- <th>Created At</th> --}}
+                                    {{-- <th>Updated At</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ( $project->tasks as $task )
                                 <tr>
                                     <td>{{$task->priority}}</td>
-                                    <td>{{$task->name}}</td>
-                                    <td>{{$task->createdBy->name}}</td>
-                                    <td>{{$task->created_at}}</td>
-                                    <td>{{$task->updated_at}}</td>
+                                    <td>{{$task->status}}</td>
+                                    <td>{{$task->title}}</td>
+                                    <td>{{$task->due_date}}</td>
+                                    {{-- <td>{{$task->created_at}}</td> --}}
+                                    {{-- <td>{{$task->updated_at}}</td> --}}
                                 </tr>
                                 @endforeach
                             </tbody>
